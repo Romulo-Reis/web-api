@@ -1,14 +1,15 @@
 const Spoiler = require("../model/spoiler");
+const status = require("http-status");
 
 exports.buscarUm = (request, response, next) => {
     const id = request.params.id;
 
-    Spoiler.findById(id)
+    Spoiler.findByPk(id)
     .then(spoiler=>{
         if(spoiler){
-            response.send(spoiler);
+            response.status(status.OK).send(spoiler);
         }else{
-            response.status(404).send();
+            response.status(status.NOT_FOUND).send();
         }
     })
     .catch(error => next(error));
@@ -20,11 +21,11 @@ exports.buscarTodos = (request, response, next) => {
     let pagina = parseInt(request.query.pagina || 0);
 
     if(!Number.isInteger(limite) || !Number.isInteger(pagina)){
-        response.status(400).send();
+        response.status(status.BAD_REQUEST).send();
     }
     const ITENS_POR_PAGINA = 10;
-    limite = limite > ITENS_POR_PAGINA || limite <= 0 ? ITENS_POR_PAGINA: limite;
-    pagina = pagina <= 0? 0: pagina * limite;
+    limite = limite > ITENS_POR_PAGINA || limite <= 0 ? ITENS_POR_PAGINA : limite;
+    pagina = pagina <= 0 ? 0 : pagina * limite;
 
     Spoiler.findAll({limit: limite, offset: pagina})
     .then(spoilers =>{
@@ -44,7 +45,7 @@ exports.criar = (request, response, next) => {
         descricao: descricao
     })
     .then(()=>{
-        response.status(201).send();
+        response.status(status.CREATED).send();
     })
     .catch(error =>next(error));
 };
@@ -56,7 +57,7 @@ exports.atualizar = (request, response, next) =>{
     const espoliador = request.body.espoliador
     const descricao = request.body.descricao
 
-    Spoiler.findById(id)
+    Spoiler.findByPk(id)
     .then(spoiler =>{
         if(spoiler){
             Spoiler.update(
@@ -72,16 +73,16 @@ exports.atualizar = (request, response, next) =>{
             })
             .catch(error => next(error));
         }else{
-            response.status(404).send();
+            response.status(status.NOT_FOUND).send();
         }
     })
-    .catch(error => next(error))
+    .catch(error => next(error));
 };
 
 exports.excluir = (request, response, next) =>{
     const id = request.params.id;
 
-    Spoiler.findById(id)
+    Spoiler.findByPk(id)
     .then(spoiler =>{
         if(spoiler){
             Spoiler.destroy({
@@ -92,7 +93,7 @@ exports.excluir = (request, response, next) =>{
             })
             .catch(error => next(error));
         }else{
-            response.status(404).send();
+            response.status(status.NOT_FOUND).send();
         }
     })
     .catch(error =>next(error));
