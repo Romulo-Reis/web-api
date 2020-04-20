@@ -13,3 +13,5 @@ const sequelize = Sequelize(
         dialect: config.database.dialect
     }
 );
+
+module.exports = sequelize;
